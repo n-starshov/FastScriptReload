@@ -18,9 +18,7 @@ namespace FastScriptReload.Editor
             this.includeSubdirectories = includeSubdirectories;
         }
 
-        [Obsolete("Serialization requir" +
-                  "" +
-                  "ed")]
+        [Obsolete("Serialization required")]
         public FileWatcherSetupEntry()
         {
         }

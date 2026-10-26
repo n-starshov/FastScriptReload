@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace FastScriptReload.Editor
 {
-    // facade for API changes introduced in Unity 6
+    // a facade for API changes introduced in Unity 6
     // https://docs.unity.com/en-us/engine/6000.6/manual/programming-environment/overview-of-dot-net-in-unity/dotnet-incompatible-api
     public static class Utils
     {
