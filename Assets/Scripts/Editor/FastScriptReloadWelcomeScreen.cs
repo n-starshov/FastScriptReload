@@ -434,7 +434,7 @@ BREAKPOINTS IN ORIGINAL FILE WON'T BE HIT!", MessageType.Error);
 
                         EditorGUILayout.HelpBox(
 @"You can do that via:
-    - clicking link in console-window after change, eg
+    - clicking link in console-window after change, eg  
       'FSR: Files: FunctionLibrary.cs changed (click here to debug [in bottom details pane]) (...)'
       (it needs to be clicked in bottom details pane, double click will simply take you to log location)", MessageType.Warning);
                         GUILayout.Space(10);

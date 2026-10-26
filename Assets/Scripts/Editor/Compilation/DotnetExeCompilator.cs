@@ -125,7 +125,16 @@ namespace FastScriptReload.Editor.Compilation
 
                 var exitCode = ExecuteDotnetExeCompilation(_dotnetExePath, _cscDll, rspFile, outLibraryPath, out var outputMessages);
 
-                var compiledAssembly = Assembly.LoadFrom(outLibraryPath);
+#if UNITY_6000_6_OR_NEWER
+                Assembly compiledAssembly = null;
+                unityMainThreadDispatcher.EnqueueAsync(() =>
+                {
+                    compiledAssembly = Utils.LoadAssemblyFromPath(outLibraryPath);
+                }).Wait();
+#else
+                var compiledAssembly = Utils.LoadAssemblyFromPath(outLibraryPath);
+#endif
+               
                 return new CompileResult(outLibraryPath, outputMessages, exitCode, compiledAssembly, createSourceCodeCombinedResult.SourceCode,
                     sourceCodeCombinedFilePath, createInternalVisibleToAsmElapsedMilliseconds);
             }
@@ -195,7 +204,8 @@ You can also:
                     var createdAssemblyWithInternalsVisibleToNewlyCompiled = AddInternalsVisibleToForAllUserAssembliesPostProcess.CreateAssemblyWithInternalsContentsVisibleTo(
                         friendAssembly, asmName
                     );
-                    originalAssemblyPathToAsmWithInternalsVisibleToCompiled.Add(friendAssembly.Location, createdAssemblyWithInternalsVisibleToNewlyCompiled);
+                    
+                    originalAssemblyPathToAsmWithInternalsVisibleToCompiled.Add(Utils.GetAssemblyLocation(friendAssembly), createdAssemblyWithInternalsVisibleToNewlyCompiled);
                 }
             }
             catch (Exception e)
@@ -223,7 +233,7 @@ You can also:
             // FSR (via Harmony) originally did this search by enumerating assembly.GetTypes().
             // I can't see anything in the documentation suggesting the assembly.GetType(typeName) version misses any cases.
             // It's much faster.
-            assembly = AppDomain.CurrentDomain.GetAssemblies().SingleOrDefault(asm => asm.GetType(typeName, false) != null);
+            assembly = Utils.GetAssemblies().SingleOrDefault(asm => asm.GetType(typeName, false) != null);
 
             if (assembly != null) _typeNameAssemblyCache.Add(typeName, assembly);
             return assembly;
@@ -238,7 +248,8 @@ You can also:
             if (!_assemblyNameToFriendAssemblyCache.TryGetValue(assemblyName, out var assemblies))
             {
                 _assemblyNameToFriendAssemblyCache[assemblyName] = assemblies = new();
-                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                var loadedAssemblies = Utils.GetAssemblies();
+                foreach (var assembly in loadedAssemblies)
                 {
                     if (assembly.IsDynamic) continue;
 

@@ -1,12 +1,12 @@
 fileFormatVersion: 2
-guid: 494e757c92cba704db1d95279f80a30f
+guid: 167b51e862211456ea1e2ffbb3852e3a
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
   iconMap: {}
   executionOrder: {}
   defineConstraints:
-  - UNITY_EDITOR || LiveScriptReload_IncludeInBuild_Enabled
+  - UNITY_6000_6_OR_NEWER
   isPreloaded: 0
   isOverridable: 0
   isExplicitlyReferenced: 1
@@ -17,18 +17,11 @@ PluginImporter:
     second:
       enabled: 0
       settings:
-        Exclude Android: 0
         Exclude Editor: 0
         Exclude Linux64: 0
         Exclude OSXUniversal: 0
         Exclude Win: 0
         Exclude Win64: 0
-  - first:
-      Android: Android
-    second:
-      enabled: 1
-      settings:
-        CPU: ARMv7
   - first:
       Any: 
     second:

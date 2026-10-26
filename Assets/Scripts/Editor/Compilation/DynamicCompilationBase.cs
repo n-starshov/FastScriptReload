@@ -320,20 +320,19 @@ namespace FastScriptReload.Editor.Compilation
         protected static List<string> ResolveReferencesToAdd(List<string> excludeAssyNames)
         {
             var referencesToAdd = new List<string>();
-            foreach (var assembly in AppDomain.CurrentDomain
-                         .GetAssemblies() //TODO: PERF: just need to load once and cache? or get assembly based on changed file only?
+            foreach (var assembly in Utils.GetAssemblies() //TODO: PERF: just need to load once and cache? or get assembly based on changed file only?
                          .Where(a => excludeAssyNames.All(assyName => !a.FullName.StartsWith(assyName))
-												&& CustomAttributeExtensions.GetCustomAttribute<DynamicallyCreatedAssemblyAttribute>((Assembly)a) == null))
+                                     && CustomAttributeExtensions.GetCustomAttribute<DynamicallyCreatedAssemblyAttribute>((Assembly)a) == null))
             {
                 try
                 {
-                    if (string.IsNullOrEmpty(assembly.Location))
+                    var assemblyPath = Utils.GetAssemblyLocation(assembly);
+                    if (string.IsNullOrEmpty(assemblyPath))
                     {
                         LoggerScoped.LogDebug($"FastScriptReload: Assembly location is null, usually dynamic assembly, harmless.");
                         continue;
                     }
-
-                    referencesToAdd.Add(assembly.Location);
+                    referencesToAdd.Add(assemblyPath);
                 }
                 catch (Exception)
                 {

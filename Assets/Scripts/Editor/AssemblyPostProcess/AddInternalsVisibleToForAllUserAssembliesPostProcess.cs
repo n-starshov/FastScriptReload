@@ -35,12 +35,24 @@ namespace FastScriptReload.Editor.AssemblyPostProcess
                 AdjustedAssemblyRoot.Create();
 
             // var readerParams = new ReaderParameters { ReadWrite = false };
+            // var readerParams = Activator.CreateInstance(ReaderParametersType);
+            // ReaderParametersType.GetProperty("ReadWrite").SetValue(readerParams, false);
+            
+            // Create a resolver that can find Unity engine assemblies
+            var resolverType = CecilAssembly.GetType("Mono.Cecil.DefaultAssemblyResolver");
+            var resolver = Activator.CreateInstance(resolverType);
+            // Add Unity's Managed folder so Cecil can find UnityEngine.CoreModule, etc.
+            resolverType.GetMethod("AddSearchDirectory").Invoke(resolver, new object[] { EditorApplication.applicationContentsPath + "/Managed" });
+            resolverType.GetMethod("AddSearchDirectory").Invoke(resolver, new object[] { EditorApplication.applicationContentsPath + "/Managed/UnityEngine" });
+
+            // var readerParams = new ReaderParameters { ReadWrite = false, AssemblyResolver = resolver };
             var readerParams = Activator.CreateInstance(ReaderParametersType);
             ReaderParametersType.GetProperty("ReadWrite").SetValue(readerParams, false);
-
+            ReaderParametersType.GetProperty("AssemblyResolver").SetValue(readerParams, resolver);
+            
             // var assembly = AssemblyDefinition.ReadAssembly(path, readerParams);
             var readAssemblyMethod = AssemblyDefinitionType.GetMethod("ReadAssembly", new[] { typeof(string), ReaderParametersType });
-            var assemblyDef = readAssemblyMethod.Invoke(null, new[] { changedAssembly.Location, readerParams });
+            var assemblyDef = readAssemblyMethod.Invoke(null, new[] { Utils.GetAssemblyLocation(changedAssembly), readerParams });
 
             try
             {
